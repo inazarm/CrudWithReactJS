@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import "./HomePage.scss";
-import { TextField, Button } from '@mui/material';
+import { TextField, Button} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import CrudServices from '../Services/CrudServices';
 
 const Service = new CrudServices();
@@ -9,9 +11,11 @@ class HomePage extends Component {
     constructor() {
         super();
         this.state = {
+            UserId:'',
             UserName: '',
             Age: '',
-            DataRecord:[]
+            DataRecord: [],
+            UpdateFlag:false
         }
     }
     componentWillMount() {
@@ -23,7 +27,7 @@ class HomePage extends Component {
         Service.ReadRecord().then((data) => {
             console.info(data);
             console.info(data.data.readInformation);
-            this.setState({DataRecord:data.data.readInformation})
+            this.setState({ DataRecord: data.data.readInformation })
         }).catch((error) => {
             console.info(error);
         })
@@ -41,20 +45,54 @@ class HomePage extends Component {
             console.info("Input fields can not be empty!");
             return;
         }
-
         console.info("data : ", this.state);
-        const data = {
-            UserName: this.state.UserName,
-            Age: Number(this.state.Age)
+        if(this.state.UpdateFlag===false){
+            const data = {
+                UserName: this.state.UserName,
+                Age: Number(this.state.Age)
+            }
+            Service.CreateRecord(data).then((data) => {
+                console.info(data)
+                this.ReadRecord()
+            }).catch((error) => {
+                console.info(error)
+            })
         }
-        Service.CreateRecord(data).then((data) => {
-            console.info(data)
-        }).catch((error) => {
-            console.info(error)
-        })
+        else{
+            const data={
+                UserId:Number(this.state.UserId),
+                UserName:this.state.UserName,
+                Age:Number(this.state.Age)
+            }
+
+            Service.UpdateRecord(data).then((data)=>{
+                console.info(data)
+                this.ReadRecord()
+            }).catch((error)=>{
+                console.info(error)
+            })
+        }
+        this.setState({UpdateFlag:false,UserName:'',Age:''})
+    }
+
+    handleEdit = (data)=>{
+        this.setState({UserName:data.userName,UserId:data.userID,Age:data.age,UpdateFlag:true})
+    }
+
+    handleDelete =(datas)=>{
+        const data={
+            UserId:Number(datas.userID),
+          }
+        Service.DeleteRecord(data).then((data)=>{
+            console.info(data);
+            this.ReadRecord();
+        }).catch((error)=>{
+            console.info(error);
+        });
     }
     render() {
         let state = this.state;
+        let self=this;
         return (
             <div className="MainContainer">
                 <div className="SubContainer">
@@ -91,16 +129,42 @@ class HomePage extends Component {
                     </div>
                     <div className='Box2'>
                         {
+                            Array.isArray(this.state.DataRecord) && this.state.DataRecord.length>0?
                             this.state.DataRecord.map(function (data, index) {
                                 return (
-                                    <div className='data-flex'>
+                                    <div key={index} className='data-flex'>
+                                        <div className='userID'>{data.userID}</div>
+                                        <div className='userName'>{data.userName}</div>
+                                        <div className='age'>{data.age}</div>
+                                        <div className='Edit'>
+                                        <Button variant="outlined" onClick={()=>{self.handleEdit(data)}} ><EditIcon/></Button>
+                                        </div>
+                                        <div className='Delete'>
+                                        <Button variant="outlined" color="error" onClick={()=>{self.handleDelete(data)}} ><DeleteIcon/></Button>
+                                        </div>
+                                        
+                                    </div>
+                                )
+                            }):<div className='data-flex'>
+                            <div className='record-not-found'>Record not found</div>
+                        </div>
+                        }
+                        {/* {this.state.DataRecord.length === 0 ? (
+                            <div className='data-flex'>
+                                <div className='record-not-found'>Record not found</div>
+                            </div>
+
+                        ) : (
+                            this.state.DataRecord.map(function (data, index) {
+                                return (
+                                    <div key={index} className='data-flex'>
                                         <div className='userID'>{data.userID}</div>
                                         <div className='userName'>{data.userName}</div>
                                         <div className='age'>{data.age}</div>
                                     </div>
                                 )
                             })
-                        }
+                        )} */}
                     </div>
                 </div>
             </div>

@@ -49,6 +49,35 @@
             box-shadow: 0 3px 8px rgba(0, 0, 0, 25);
             background-color: white;
             flex-direction: column;
+            .data-flex{
+                height: 50px;
+                display:flex;
+                align-items: center;
+                border-bottom:0.5px solid lightgray;
+                font-family:sans-serif;
+                font-weight: 600;
+                margin:5px 0 0 0;
+                .userID{
+                    flex:5;
+                    @extend .flexCenter
+                }
+                .userName{
+                    flex:15;
+                    @extend .flexCenter
+                }
+                .age{
+                    flex:5;
+                    @extend .flexCenter
+                }
+                .Edit,.Delete{
+                    flex:2;
+                    margin:5px 6px;
+                }
+            }
+            .record-not-found{
+                flex:15;
+                @extend .flexCenter
+            }
         }
     }
 }

@@ -9,6 +9,11 @@ export default class AxiosServices{
     }
     get(url,IsRequired=false,Header){
         return Axios.get(url,IsRequired && Header);
-
+    }
+    put(url,data,IsRequired=false,Header){
+        return Axios.put(url,data,IsRequired && Header)
+    }
+    delete(url,data,IsRequired=false,Header){
+        return Axios.post(url,data,IsRequired && Header)
     }
 }
